@@ -1,6 +1,6 @@
-import { NextFunction, Request, Response } from "express";
-import { AuthErrorCodes } from "firebase-admin/auth";
+import { NextFunction, Request, Response, RequestHandler } from "express";
 import { firebaseAuth } from "../config/firebase";
+import { findOrCreateUserByFirebase } from "../modules/auth/firebase-auth.service";
 
 const extractBearerToken = (header?: string): string | null => {
   if (!header) return null;
@@ -31,17 +31,41 @@ export const verifyFirebaseToken = async (
           (error as any).code
         : undefined;
 
-    const statusCode =
-      code === AuthErrorCodes.ID_TOKEN_REVOKED ||
-      code === AuthErrorCodes.SESSION_COOKIE_REVOKED
-        ? 403
-        : 401;
+    const revokedCodes = ["auth/id-token-revoked", "auth/session-cookie-revoked"];
+    const statusCode = revokedCodes.includes(code ?? "") ? 403 : 401;
 
     const message =
-      code === AuthErrorCodes.ID_TOKEN_EXPIRED
-        ? "Firebase token expired"
-        : "Invalid Firebase token";
+      code === "auth/id-token-expired" ? "Firebase token expired" : "Invalid Firebase token";
 
     res.status(statusCode).json({ success: false, message });
   }
 };
+
+export const attachUserFromFirebase: RequestHandler = async (
+  req,
+  res,
+  next,
+) => {
+  if (!req.firebaseUser) {
+    res.status(401).json({ success: false, message: "Unauthenticated" });
+    return;
+  }
+
+  try {
+    const user = await findOrCreateUserByFirebase({
+      uid: req.firebaseUser.uid,
+      email: req.firebaseUser.email,
+      name: req.firebaseUser.name,
+    });
+
+    req.authUser = user;
+    next();
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const requireAuth: RequestHandler[] = [
+  verifyFirebaseToken,
+  attachUserFromFirebase,
+];
