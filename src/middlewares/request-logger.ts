@@ -9,11 +9,33 @@ export const requestLogger = (
 
   res.on("finish", () => {
     const duration = Date.now() - start;
-    console.log(
-      `[${new Date().toISOString()}] ${req.method} ${
-        req.originalUrl
-      } ${res.statusCode} - ${duration}ms`,
-    );
+    const baseLog = {
+      timestamp: new Date().toISOString(),
+      method: req.method,
+      path: req.originalUrl,
+      status: res.statusCode,
+      durationMs: duration,
+    };
+
+    if (res.statusCode >= 400) {
+      console.error(
+        JSON.stringify({
+          ...baseLog,
+          error:
+            res.locals.errorPayload ??
+            ({
+              timestamp: baseLog.timestamp,
+              path: req.originalUrl,
+              status: res.statusCode,
+              code: "UNKNOWN_ERROR",
+              message: "Request failed",
+            } as const),
+        }),
+      );
+      return;
+    }
+
+    console.log(JSON.stringify(baseLog));
   });
 
   next();
