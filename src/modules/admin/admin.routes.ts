@@ -1,27 +1,23 @@
-import { Router, RequestHandler } from "express";
+import { Router } from "express";
 import { prisma } from "../../config/db";
-import { requireAuth } from "../../middlewares/firebase-auth";
-import { createHttpError } from "../../utils/http-error";
+import { authenticate } from "../../middlewares/auth";
+import { requireAdmin } from "../../middlewares/rbac";
+import { createError } from "../../utils/errors";
 
 const router = Router();
-
-const ensureAdmin: RequestHandler = (req, _res, next) => {
-  if (req.authUser?.role !== "ADMIN") {
-    next(createHttpError(403, "Admin privileges are required"));
-    return;
-  }
-  next();
-};
 
 const parseId = (raw: string, label: string): number => {
   const parsed = Number(raw);
   if (Number.isNaN(parsed)) {
-    throw createHttpError(400, `${label} must be a number`);
+    throw createError(`${label} must be a number`, {
+      statusCode: 400,
+      code: "INVALID_ID",
+    });
   }
   return parsed;
 };
 
-router.use(...requireAuth, ensureAdmin);
+router.use(authenticate, requireAdmin);
 
 router.get("/users/:id/attendance", async (req, res, next) => {
   try {
@@ -31,7 +27,12 @@ router.get("/users/:id/attendance", async (req, res, next) => {
       where: { id: userId },
       select: { id: true, email: true, name: true, role: true, status: true },
     });
-    if (!user) throw createHttpError(404, "User not found");
+    if (!user) {
+      throw createError("User not found", {
+        statusCode: 404,
+        code: "USER_NOT_FOUND",
+      });
+    }
 
     const records = await prisma.attendanceRecord.findMany({
       where: { userId },
