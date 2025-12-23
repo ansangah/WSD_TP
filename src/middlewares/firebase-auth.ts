@@ -1,5 +1,5 @@
 import { NextFunction, Request, Response, RequestHandler } from "express";
-import { firebaseAuth } from "../config/firebase";
+import { getFirebaseAuth } from "../config/firebase";
 import { findOrCreateUserByFirebase } from "../modules/auth/firebase-auth.service";
 
 const extractBearerToken = (header?: string): string | null => {
@@ -21,7 +21,7 @@ export const verifyFirebaseToken = async (
   }
 
   try {
-    const decoded = await firebaseAuth.verifyIdToken(token, true);
+    const decoded = await getFirebaseAuth().verifyIdToken(token, true);
     req.firebaseUser = decoded;
     next();
   } catch (error: unknown) {
