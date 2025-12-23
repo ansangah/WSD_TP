@@ -1,22 +1,26 @@
 import { NextFunction, Request, Response } from "express";
-
-interface AppError extends Error {
-  statusCode?: number;
-}
+import {
+  AppError,
+  formatErrorResponse,
+  isAppError,
+} from "../utils/errors";
 
 export const errorHandler = (
-  err: AppError,
-  _req: Request,
+  err: unknown,
+  req: Request,
   res: Response,
   _next: NextFunction,
 ): void => {
-  const statusCode = err.statusCode ?? 500;
-  const message = err.message ?? "Internal server error";
+  const handledError =
+    err instanceof Error
+      ? err
+      : new AppError("Internal server error");
 
-  console.error(err);
+  if (!isAppError(handledError)) {
+    console.error(handledError);
+  }
 
-  res.status(statusCode).json({
-    success: false,
-    message,
-  });
+  const payload = formatErrorResponse(handledError, req.originalUrl);
+  res.locals.errorPayload = payload;
+  res.status(payload.status).json(payload);
 };

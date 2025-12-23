@@ -1,1 +1,80 @@
-GET /users
+### 서버 상태 확인
+GET http://localhost:8080/health
+
+### 회원가입
+POST http://localhost:8080/auth/register
+Content-Type: application/json
+
+{
+  "email": "newuser@example.com",
+  "password": "Password123!",
+  "name": "New User"
+}
+
+### 로그인
+POST http://localhost:8080/auth/login
+Content-Type: application/json
+
+{
+  "email": "newuser@example.com",
+  "password": "Password123!"
+}
+
+### 토큰 갱신
+POST http://localhost:8080/auth/refresh
+Content-Type: application/json
+
+{
+  "refreshToken": "{{refreshToken}}"
+}
+
+### 구글 소셜 로그인 (idToken 은 클라이언트에서 획득) 아직 미구현
+POST http://localhost:8080/auth/google
+Content-Type: application/json
+
+{
+  "idToken": "{{googleIdToken}}"
+}
+
+### 카카오 소셜 로그인 (accessToken 은 카카오 SDK 에서 획득)  아직 미구현
+POST http://localhost:8080/auth/kakao
+Content-Type: application/json
+
+{
+  "accessToken": "{{kakaoAccessToken}}"
+}
+
+### Firebase 로그인 (Firebase Auth 로 받아온 ID Token 사용)
+POST http://localhost:8080/auth/firebase
+Content-Type: application/json
+
+{
+  "idToken": "{{firebaseIdToken}}"
+}
+
+### 내 정보 확인 (Authorization 헤더에 Access Token 필요)
+GET http://localhost:8080/users/me
+Authorization: Bearer {{accessToken}}
+
+### 내 정보 수정
+PATCH http://localhost:8080/users/me
+Authorization: Bearer {{accessToken}}
+Content-Type: application/json
+
+{
+  "name": "Updated User Name"
+}
+
+### 비밀번호 변경
+PATCH http://localhost:8080/users/me/password
+Authorization: Bearer {{accessToken}}
+Content-Type: application/json
+
+{
+  "currentPassword": "Password123!",
+  "newPassword": "NewPassword123!"
+}
+
+### 관리자 - 전체 유저 조회
+GET http://localhost:8080/admin/users
+Authorization: Bearer {{adminAccessToken}}
