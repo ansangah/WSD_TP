@@ -10,7 +10,6 @@ import { prisma } from "./config/db";
 
 const app = express();
 
-// 기본 보안 및 파서
 app.use(cors());
 app.use(helmet());
 app.use(express.json());
@@ -52,10 +51,8 @@ app.get("/docs", (_req, res) => {
   res.type("html").send(swaggerHtml);
 });
 
-// 라우트 연결
 app.use("/", routes);
 
-// 에러 핸들러
 app.use(errorHandler);
 
 export default app;
