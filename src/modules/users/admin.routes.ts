@@ -4,18 +4,51 @@ import { authenticate } from "../../middlewares/auth";
 import { requireAdmin } from "../../middlewares/rbac";
 import { createError } from "../../utils/errors";
 import { sanitizeUser } from "../auth/auth.service";
+import { parsePagination, parseSortParam } from "../../utils/pagination";
 
 const router = Router();
 
 router.use(authenticate, requireAdmin);
 
-router.get("/", async (_req, res, next) => {
+router.get("/", async (req, res, next) => {
   try {
-    const users = await prisma.user.findMany({
-      orderBy: { createdAt: "desc" },
+    const keyword = (req.query.q ?? req.query.keyword) as string | undefined;
+    const pagination = parsePagination({
+      page: req.query.page ?? undefined,
+      size: req.query.size ?? undefined,
     });
+    const { orderBy, sortString } = parseSortParam(
+      typeof req.query.sort === "string" ? req.query.sort : undefined,
+      ["createdAt", "email", "name", "status", "role"],
+      "createdAt",
+    );
+    const where: Record<string, unknown> = {};
+    if (keyword) {
+      const value = String(keyword);
+      where.OR = [
+        { email: { contains: value, mode: "insensitive" } },
+        { name: { contains: value, mode: "insensitive" } },
+      ];
+    }
 
-    res.json({ users: users.map(sanitizeUser) });
+    const [total, users] = await prisma.$transaction([
+      prisma.user.count({ where }),
+      prisma.user.findMany({
+        where,
+        orderBy,
+        skip: pagination.skip,
+        take: pagination.take,
+      }),
+    ]);
+
+    res.json({
+      content: users.map(sanitizeUser),
+      page: pagination.page,
+      size: pagination.size,
+      totalElements: total,
+      totalPages: Math.ceil(total / pagination.size),
+      sort: sortString,
+    });
   } catch (error) {
     next(error);
   }

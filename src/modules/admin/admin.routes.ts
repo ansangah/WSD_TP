@@ -3,6 +3,7 @@ import { prisma } from "../../config/db";
 import { authenticate } from "../../middlewares/auth";
 import { requireAdmin } from "../../middlewares/rbac";
 import { createError } from "../../utils/errors";
+import { parsePagination, parseSortParam } from "../../utils/pagination";
 
 const router = Router();
 
@@ -48,29 +49,39 @@ router.get("/users/:id/attendance", async (req, res, next) => {
 
 router.get("/studies", async (req, res, next) => {
   try {
+    const keyword = (req.query.q ?? req.query.keyword) as string | undefined;
     const status =
       typeof req.query.status === "string" && req.query.status.length > 0
         ? req.query.status
         : undefined;
-    const page = Number(
-      typeof req.query.page === "string" ? req.query.page : req.query.page?.toString(),
+    const pagination = parsePagination({
+      page: req.query.page ?? undefined,
+      size: req.query.size ?? undefined,
+    });
+    const where: Record<string, unknown> = {};
+    if (status) {
+      where.status = status;
+    }
+    if (keyword) {
+      const value = String(keyword);
+      where.OR = [
+        { title: { contains: value, mode: "insensitive" } },
+        { description: { contains: value, mode: "insensitive" } },
+      ];
+    }
+    const { orderBy, sortString } = parseSortParam(
+      typeof req.query.sort === "string" ? req.query.sort : undefined,
+      ["createdAt", "title", "status"],
+      "createdAt",
     );
-    const size = Number(
-      typeof req.query.size === "string" ? req.query.size : req.query.size?.toString(),
-    );
-
-    const pageNum = Number.isNaN(page) || page < 1 ? 1 : page;
-    const sizeNum = Number.isNaN(size) || size < 1 ? 10 : Math.min(size, 50);
-
-    const where = status ? { status } : {};
 
     const [total, studies] = await prisma.$transaction([
       prisma.study.count({ where }),
       prisma.study.findMany({
         where,
-        skip: (pageNum - 1) * sizeNum,
-        take: sizeNum,
-        orderBy: { createdAt: "desc" },
+        skip: pagination.skip,
+        take: pagination.take,
+        orderBy,
         include: {
           leader: { select: { id: true, name: true, email: true } },
           _count: { select: { StudyMembers: true, Sessions: true } },
@@ -79,11 +90,12 @@ router.get("/studies", async (req, res, next) => {
     ]);
 
     res.json({
-      items: studies,
-      page: pageNum,
-      size: sizeNum,
-      total,
-      totalPages: Math.ceil(total / sizeNum),
+      content: studies,
+      page: pagination.page,
+      size: pagination.size,
+      totalElements: total,
+      totalPages: Math.ceil(total / pagination.size),
+      sort: sortString,
     });
   } catch (error) {
     next(error);

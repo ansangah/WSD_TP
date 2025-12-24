@@ -1,11 +1,13 @@
 import { Router } from "express";
 import {
+  issueTokens,
   loginUser,
   logoutUser,
   refreshTokens,
   registerUser,
 } from "./auth.service";
 import { loginWithGoogle } from "./social.service";
+import { loginWithFirebaseIdToken } from "./firebase-auth.service";
 import { createError } from "../../utils/errors";
 
 const router = Router();
@@ -104,6 +106,24 @@ router.post("/google", async (req, res, next) => {
     }
 
     const result = await loginWithGoogle(idToken);
+    res.json(result);
+  } catch (error) {
+    next(error);
+  }
+});
+
+router.post("/firebase", async (req, res, next) => {
+  try {
+    const { idToken } = req.body;
+    if (!idToken) {
+      throw createError("idToken is required", {
+        statusCode: 400,
+        code: "INVALID_PAYLOAD",
+      });
+    }
+
+    const user = await loginWithFirebaseIdToken(idToken);
+    const result = await issueTokens(user);
     res.json(result);
   } catch (error) {
     next(error);

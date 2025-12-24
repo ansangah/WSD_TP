@@ -330,6 +330,53 @@
             }
           }
         }
+      },
+      "RateLimited": {
+        "description": "Too many requests",
+        "content": {
+          "application/json": {
+            "schema": {
+              "type": "object",
+              "properties": {
+                "status": {
+                  "type": "integer",
+                  "example": 429
+                },
+                "code": {
+                  "type": "string",
+                  "example": "RATE_LIMITED"
+                },
+                "message": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        }
+      },
+      "ServiceUnavailable": {
+        "description": "Service unavailable",
+        "content": {
+          "application/json": {
+            "schema": {
+              "type": "object",
+              "properties": {
+                "status": {
+                  "type": "string"
+                },
+                "service": {
+                  "type": "string"
+                },
+                "message": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        }
+      },
+      "NoContent": {
+        "description": "No content"
       }
     }
   },
@@ -379,6 +426,12 @@
                 }
               }
             }
+          },
+          "429": {
+            "$ref": "#/components/responses/RateLimited"
+          },
+          "503": {
+            "$ref": "#/components/responses/ServiceUnavailable"
           }
         }
       }
@@ -421,6 +474,12 @@
                 }
               }
             }
+          },
+          "429": {
+            "$ref": "#/components/responses/RateLimited"
+          },
+          "503": {
+            "$ref": "#/components/responses/ServiceUnavailable"
           }
         }
       }
@@ -459,6 +518,12 @@
                 }
               }
             }
+          },
+          "429": {
+            "$ref": "#/components/responses/RateLimited"
+          },
+          "503": {
+            "$ref": "#/components/responses/ServiceUnavailable"
           }
         }
       }
@@ -495,6 +560,12 @@
         "responses": {
           "200": {
             "description": "로그아웃 성공"
+          },
+          "429": {
+            "$ref": "#/components/responses/RateLimited"
+          },
+          "503": {
+            "$ref": "#/components/responses/ServiceUnavailable"
           }
         }
       }
@@ -525,6 +596,12 @@
                 }
               }
             }
+          },
+          "429": {
+            "$ref": "#/components/responses/RateLimited"
+          },
+          "503": {
+            "$ref": "#/components/responses/ServiceUnavailable"
           }
         }
       },
@@ -571,6 +648,12 @@
                 }
               }
             }
+          },
+          "429": {
+            "$ref": "#/components/responses/RateLimited"
+          },
+          "503": {
+            "$ref": "#/components/responses/ServiceUnavailable"
           }
         }
       }
@@ -611,6 +694,12 @@
         "responses": {
           "200": {
             "description": "비밀번호 변경 완료"
+          },
+          "429": {
+            "$ref": "#/components/responses/RateLimited"
+          },
+          "503": {
+            "$ref": "#/components/responses/ServiceUnavailable"
           }
         }
       }
@@ -628,24 +717,90 @@
         ],
         "responses": {
           "200": {
-            "description": "사용자 목록",
+            "description": "?? ?? ??",
             "content": {
               "application/json": {
                 "schema": {
                   "type": "object",
                   "properties": {
-                    "users": {
+                    "content": {
                       "type": "array",
                       "items": {
                         "$ref": "#/components/schemas/User"
                       }
+                    },
+                    "page": {
+                      "type": "integer"
+                    },
+                    "size": {
+                      "type": "integer"
+                    },
+                    "totalElements": {
+                      "type": "integer"
+                    },
+                    "totalPages": {
+                      "type": "integer"
+                    },
+                    "sort": {
+                      "type": "string"
                     }
                   }
                 }
               }
             }
+          },
+          "429": {
+            "$ref": "#/components/responses/RateLimited"
+          },
+          "503": {
+            "$ref": "#/components/responses/ServiceUnavailable"
           }
-        }
+        },
+        "parameters": [
+          {
+            "name": "q",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            },
+            "description": "?? ???"
+          },
+          {
+            "name": "keyword",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            },
+            "description": "?? ???(q? ??)"
+          },
+          {
+            "name": "page",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "description": "??? (0?? ??)"
+          },
+          {
+            "name": "size",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 50
+            },
+            "description": "??? ?? (?? 20, ?? 50)"
+          },
+          {
+            "name": "sort",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            },
+            "description": "??: field,ASC|DESC ?) createdAt,DESC"
+          }
+        ]
       }
     },
     "/admin/users/{id}/role": {
@@ -691,6 +846,12 @@
         "responses": {
           "200": {
             "description": "역할 변경 완료"
+          },
+          "429": {
+            "$ref": "#/components/responses/RateLimited"
+          },
+          "503": {
+            "$ref": "#/components/responses/ServiceUnavailable"
           }
         }
       }
@@ -719,6 +880,12 @@
         "responses": {
           "200": {
             "description": "사용자 비활성화 완료"
+          },
+          "429": {
+            "$ref": "#/components/responses/RateLimited"
+          },
+          "503": {
+            "$ref": "#/components/responses/ServiceUnavailable"
           }
         }
       }
@@ -736,14 +903,6 @@
         ],
         "parameters": [
           {
-            "name": "q",
-            "in": "query",
-            "schema": {
-              "type": "string"
-            },
-            "description": "제목/설명으로 검색"
-          },
-          {
             "name": "category",
             "in": "query",
             "schema": {
@@ -758,34 +917,58 @@
             }
           },
           {
+            "name": "q",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            },
+            "description": "?? ???"
+          },
+          {
+            "name": "keyword",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            },
+            "description": "?? ???(q? ??)"
+          },
+          {
             "name": "page",
             "in": "query",
             "schema": {
               "type": "integer",
-              "minimum": 1
+              "minimum": 0
             },
-            "description": "페이지 번호"
+            "description": "??? (0?? ??)"
           },
           {
-            "name": "pageSize",
+            "name": "size",
             "in": "query",
             "schema": {
               "type": "integer",
               "minimum": 1,
               "maximum": 50
             },
-            "description": "페이지당 항목 수"
+            "description": "??? ?? (?? 20, ?? 50)"
+          },
+          {
+            "name": "sort",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            },
+            "description": "??: field,ASC|DESC ?) createdAt,DESC"
           }
         ],
         "responses": {
           "200": {
-            "description": "스터디 목록",
+            "description": "?? ?? ??",
             "content": {
               "application/json": {
                 "schema": {
                   "type": "object",
                   "properties": {
-                    "data": {
+                    "content": {
                       "type": "array",
                       "items": {
                         "$ref": "#/components/schemas/Study"
@@ -794,11 +977,17 @@
                     "page": {
                       "type": "integer"
                     },
-                    "pageSize": {
+                    "size": {
                       "type": "integer"
                     },
-                    "total": {
+                    "totalElements": {
                       "type": "integer"
+                    },
+                    "totalPages": {
+                      "type": "integer"
+                    },
+                    "sort": {
+                      "type": "string"
                     }
                   }
                 }
@@ -813,6 +1002,12 @@
           },
           "500": {
             "$ref": "#/components/responses/InternalError"
+          },
+          "429": {
+            "$ref": "#/components/responses/RateLimited"
+          },
+          "503": {
+            "$ref": "#/components/responses/ServiceUnavailable"
           }
         }
       },
@@ -878,6 +1073,12 @@
           },
           "500": {
             "$ref": "#/components/responses/InternalError"
+          },
+          "429": {
+            "$ref": "#/components/responses/RateLimited"
+          },
+          "503": {
+            "$ref": "#/components/responses/ServiceUnavailable"
           }
         }
       }
@@ -933,6 +1134,12 @@
           },
           "500": {
             "$ref": "#/components/responses/InternalError"
+          },
+          "429": {
+            "$ref": "#/components/responses/RateLimited"
+          },
+          "503": {
+            "$ref": "#/components/responses/ServiceUnavailable"
           }
         }
       }
@@ -988,6 +1195,12 @@
           },
           "500": {
             "$ref": "#/components/responses/InternalError"
+          },
+          "429": {
+            "$ref": "#/components/responses/RateLimited"
+          },
+          "503": {
+            "$ref": "#/components/responses/ServiceUnavailable"
           }
         }
       },
@@ -1061,6 +1274,12 @@
           },
           "500": {
             "$ref": "#/components/responses/InternalError"
+          },
+          "429": {
+            "$ref": "#/components/responses/RateLimited"
+          },
+          "503": {
+            "$ref": "#/components/responses/ServiceUnavailable"
           }
         }
       }
@@ -1146,6 +1365,12 @@
           },
           "500": {
             "$ref": "#/components/responses/InternalError"
+          },
+          "429": {
+            "$ref": "#/components/responses/RateLimited"
+          },
+          "503": {
+            "$ref": "#/components/responses/ServiceUnavailable"
           }
         }
       },
@@ -1236,6 +1461,12 @@
           },
           "500": {
             "$ref": "#/components/responses/InternalError"
+          },
+          "429": {
+            "$ref": "#/components/responses/RateLimited"
+          },
+          "503": {
+            "$ref": "#/components/responses/ServiceUnavailable"
           }
         }
       }
@@ -1320,6 +1551,12 @@
           },
           "500": {
             "$ref": "#/components/responses/InternalError"
+          },
+          "429": {
+            "$ref": "#/components/responses/RateLimited"
+          },
+          "503": {
+            "$ref": "#/components/responses/ServiceUnavailable"
           }
         }
       }
@@ -1396,6 +1633,12 @@
           },
           "500": {
             "$ref": "#/components/responses/InternalError"
+          },
+          "429": {
+            "$ref": "#/components/responses/RateLimited"
+          },
+          "503": {
+            "$ref": "#/components/responses/ServiceUnavailable"
           }
         }
       }
@@ -1441,6 +1684,12 @@
           },
           "500": {
             "$ref": "#/components/responses/InternalError"
+          },
+          "429": {
+            "$ref": "#/components/responses/RateLimited"
+          },
+          "503": {
+            "$ref": "#/components/responses/ServiceUnavailable"
           }
         }
       }
@@ -1493,6 +1742,12 @@
           },
           "500": {
             "$ref": "#/components/responses/InternalError"
+          },
+          "429": {
+            "$ref": "#/components/responses/RateLimited"
+          },
+          "503": {
+            "$ref": "#/components/responses/ServiceUnavailable"
           }
         }
       },
@@ -1573,6 +1828,53 @@
           },
           "500": {
             "$ref": "#/components/responses/InternalError"
+          },
+          "429": {
+            "$ref": "#/components/responses/RateLimited"
+          },
+          "503": {
+            "$ref": "#/components/responses/ServiceUnavailable"
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "Studies"
+        ],
+        "summary": "??? ??",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "studyId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "$ref": "#/components/responses/NoContent"
+          },
+          "401": {
+            "$ref": "#/components/responses/?? ??"
+          },
+          "403": {
+            "$ref": "#/components/responses/?? ??"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          },
+          "429": {
+            "$ref": "#/components/responses/RateLimited"
+          },
+          "503": {
+            "$ref": "#/components/responses/ServiceUnavailable"
           }
         }
       }
@@ -1636,6 +1938,12 @@
           },
           "500": {
             "$ref": "#/components/responses/InternalError"
+          },
+          "429": {
+            "$ref": "#/components/responses/RateLimited"
+          },
+          "503": {
+            "$ref": "#/components/responses/ServiceUnavailable"
           }
         }
       },
@@ -1716,6 +2024,12 @@
           },
           "500": {
             "$ref": "#/components/responses/InternalError"
+          },
+          "429": {
+            "$ref": "#/components/responses/RateLimited"
+          },
+          "503": {
+            "$ref": "#/components/responses/ServiceUnavailable"
           }
         }
       },
@@ -1777,6 +2091,15 @@
           },
           "500": {
             "$ref": "#/components/responses/InternalError"
+          },
+          "429": {
+            "$ref": "#/components/responses/RateLimited"
+          },
+          "503": {
+            "$ref": "#/components/responses/ServiceUnavailable"
+          },
+          "204": {
+            "$ref": "#/components/responses/NoContent"
           }
         }
       }
@@ -1852,6 +2175,12 @@
           },
           "500": {
             "$ref": "#/components/responses/InternalError"
+          },
+          "429": {
+            "$ref": "#/components/responses/RateLimited"
+          },
+          "503": {
+            "$ref": "#/components/responses/ServiceUnavailable"
           }
         }
       }
@@ -1882,37 +2211,61 @@
             "schema": {
               "type": "string"
             },
-            "description": "멤버 상태"
+            "description": "?? ??"
+          },
+          {
+            "name": "q",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            },
+            "description": "?? ???"
+          },
+          {
+            "name": "keyword",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            },
+            "description": "?? ???(q? ??)"
           },
           {
             "name": "page",
             "in": "query",
             "schema": {
               "type": "integer",
-              "minimum": 1
+              "minimum": 0
             },
-            "description": "페이지 번호"
+            "description": "??? (0?? ??)"
           },
           {
-            "name": "pageSize",
+            "name": "size",
             "in": "query",
             "schema": {
               "type": "integer",
               "minimum": 1,
               "maximum": 50
             },
-            "description": "페이지 크기"
+            "description": "??? ?? (?? 20, ?? 50)"
+          },
+          {
+            "name": "sort",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            },
+            "description": "??: field,ASC|DESC ?) createdAt,DESC"
           }
         ],
         "responses": {
           "200": {
-            "description": "멤버 목록",
+            "description": "?? ?? ??",
             "content": {
               "application/json": {
                 "schema": {
                   "type": "object",
                   "properties": {
-                    "members": {
+                    "content": {
                       "type": "array",
                       "items": {
                         "allOf": [
@@ -1950,11 +2303,17 @@
                     "page": {
                       "type": "integer"
                     },
-                    "pageSize": {
+                    "size": {
                       "type": "integer"
                     },
-                    "total": {
+                    "totalElements": {
                       "type": "integer"
+                    },
+                    "totalPages": {
+                      "type": "integer"
+                    },
+                    "sort": {
+                      "type": "string"
                     }
                   }
                 }
@@ -1972,6 +2331,12 @@
           },
           "500": {
             "$ref": "#/components/responses/InternalError"
+          },
+          "429": {
+            "$ref": "#/components/responses/RateLimited"
+          },
+          "503": {
+            "$ref": "#/components/responses/ServiceUnavailable"
           }
         }
       }
@@ -2064,6 +2429,12 @@
           },
           "500": {
             "$ref": "#/components/responses/InternalError"
+          },
+          "429": {
+            "$ref": "#/components/responses/RateLimited"
+          },
+          "503": {
+            "$ref": "#/components/responses/ServiceUnavailable"
           }
         }
       }
@@ -2127,6 +2498,15 @@
           },
           "500": {
             "$ref": "#/components/responses/InternalError"
+          },
+          "429": {
+            "$ref": "#/components/responses/RateLimited"
+          },
+          "503": {
+            "$ref": "#/components/responses/ServiceUnavailable"
+          },
+          "204": {
+            "$ref": "#/components/responses/NoContent"
           }
         }
       }
@@ -2179,6 +2559,12 @@
           },
           "500": {
             "$ref": "#/components/responses/InternalError"
+          },
+          "429": {
+            "$ref": "#/components/responses/RateLimited"
+          },
+          "503": {
+            "$ref": "#/components/responses/ServiceUnavailable"
           }
         }
       }
@@ -2226,53 +2612,12 @@
           },
           "500": {
             "$ref": "#/components/responses/InternalError"
-          }
-        }
-      }
-    },
-    "/auth/kakao": {
-      "post": {
-        "tags": [
-          "Auth"
-        ],
-        "summary": "로그인 with Kakao access token",
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "type": "object",
-                "required": [
-                  "accessToken"
-                ],
-                "properties": {
-                  "accessToken": {
-                    "type": "string"
-                  }
-                }
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "description": "로그인 성공",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/AuthResponse"
-                }
-              }
-            }
           },
-          "400": {
-            "$ref": "#/components/responses/BadRequest"
+          "429": {
+            "$ref": "#/components/responses/RateLimited"
           },
-          "401": {
-            "$ref": "#/components/responses/권한 없음"
-          },
-          "500": {
-            "$ref": "#/components/responses/InternalError"
+          "503": {
+            "$ref": "#/components/responses/ServiceUnavailable"
           }
         }
       }
@@ -2320,6 +2665,12 @@
           },
           "500": {
             "$ref": "#/components/responses/InternalError"
+          },
+          "429": {
+            "$ref": "#/components/responses/RateLimited"
+          },
+          "503": {
+            "$ref": "#/components/responses/ServiceUnavailable"
           }
         }
       }
@@ -2381,6 +2732,12 @@
           },
           "500": {
             "$ref": "#/components/responses/InternalError"
+          },
+          "429": {
+            "$ref": "#/components/responses/RateLimited"
+          },
+          "503": {
+            "$ref": "#/components/responses/ServiceUnavailable"
           }
         }
       }
@@ -2405,12 +2762,29 @@
             }
           },
           {
+            "name": "q",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            },
+            "description": "?? ???"
+          },
+          {
+            "name": "keyword",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            },
+            "description": "?? ???(q? ??)"
+          },
+          {
             "name": "page",
             "in": "query",
             "schema": {
               "type": "integer",
-              "minimum": 1
-            }
+              "minimum": 0
+            },
+            "description": "??? (0?? ??)"
           },
           {
             "name": "size",
@@ -2419,18 +2793,27 @@
               "type": "integer",
               "minimum": 1,
               "maximum": 50
-            }
+            },
+            "description": "??? ?? (?? 20, ?? 50)"
+          },
+          {
+            "name": "sort",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            },
+            "description": "??: field,ASC|DESC ?) createdAt,DESC"
           }
         ],
         "responses": {
           "200": {
-            "description": "스터디 목록",
+            "description": "?? ?? ??",
             "content": {
               "application/json": {
                 "schema": {
                   "type": "object",
                   "properties": {
-                    "items": {
+                    "content": {
                       "type": "array",
                       "items": {
                         "$ref": "#/components/schemas/Study"
@@ -2442,11 +2825,14 @@
                     "size": {
                       "type": "integer"
                     },
-                    "total": {
+                    "totalElements": {
                       "type": "integer"
                     },
                     "totalPages": {
                       "type": "integer"
+                    },
+                    "sort": {
+                      "type": "string"
                     }
                   }
                 }
@@ -2464,6 +2850,12 @@
           },
           "500": {
             "$ref": "#/components/responses/InternalError"
+          },
+          "429": {
+            "$ref": "#/components/responses/RateLimited"
+          },
+          "503": {
+            "$ref": "#/components/responses/ServiceUnavailable"
           }
         }
       }
@@ -2542,6 +2934,12 @@
           },
           "500": {
             "$ref": "#/components/responses/InternalError"
+          },
+          "429": {
+            "$ref": "#/components/responses/RateLimited"
+          },
+          "503": {
+            "$ref": "#/components/responses/ServiceUnavailable"
           }
         }
       }
@@ -2619,6 +3017,12 @@
           },
           "500": {
             "$ref": "#/components/responses/InternalError"
+          },
+          "429": {
+            "$ref": "#/components/responses/RateLimited"
+          },
+          "503": {
+            "$ref": "#/components/responses/ServiceUnavailable"
           }
         }
       }
@@ -2672,6 +3076,12 @@
           },
           "500": {
             "$ref": "#/components/responses/InternalError"
+          },
+          "429": {
+            "$ref": "#/components/responses/RateLimited"
+          },
+          "503": {
+            "$ref": "#/components/responses/ServiceUnavailable"
           }
         }
       }

@@ -3,6 +3,7 @@ import cors from "cors";
 import helmet from "helmet";
 import fs from "fs";
 import path from "path";
+import rateLimit from "express-rate-limit";
 import { requestLogger } from "./middlewares/request-logger";
 import { errorHandler } from "./middlewares/error-handler";
 import routes from "./routes";
@@ -17,7 +18,21 @@ app.use(
     contentSecurityPolicy: false,
   }),
 );
-app.use(express.json());
+app.use(express.json({ limit: "1mb" }));
+
+const limiter = rateLimit({
+  windowMs: 60 * 1000,
+  max: 200,
+  standardHeaders: true,
+  legacyHeaders: false,
+  message: {
+    status: 429,
+    code: "RATE_LIMITED",
+    message: "Too many requests, please try again later.",
+  },
+});
+
+app.use(limiter);
 app.use(requestLogger);
 
 const openApiPath = path.resolve(process.cwd(), "docs", "openapi.json");
@@ -49,6 +64,16 @@ app.get("/health", (req, res) => {
   const pkg = JSON.parse(fs.readFileSync(pkgPath, "utf-8"));
   const buildTime = process.env.BUILD_TIME || process.env.VERCEL_BUILD_TIME || process.env.HEROKU_RELEASE_CREATED_AT;
 
+  if (process.env.MAINTENANCE_MODE === "true") {
+    res.status(503).json({
+      status: "UNAVAILABLE",
+      service: "GoGoStudy API",
+      message: "Service is under maintenance",
+      timestamp: new Date().toISOString(),
+    });
+    return;
+  }
+
   res.json({
     status: "OK",
     service: "GoGoStudy API",
@@ -75,6 +100,26 @@ app.get("/docs", (_req, res) => {
     ].join("; "),
   );
   res.type("html").send(swaggerHtml);
+});
+
+app.get("/", (_req, res) => {
+  res.type("html").send(
+    [
+      "<!doctype html>",
+      "<html>",
+      "<head><meta charset=\"utf-8\"><title>GoGoStudy API</title></head>",
+      "<body style=\"font-family: sans-serif; padding: 24px;\">",
+      "<h1>GoGoStudy API</h1>",
+      "<p>API 서버가 실행 중입니다.</p>",
+      "<ul>",
+      "<li><a href=\"/docs\">Swagger UI</a></li>",
+      "<li><a href=\"/docs.json\">OpenAPI JSON</a></li>",
+      "<li><a href=\"/health\">Health Check</a></li>",
+      "</ul>",
+      "</body>",
+      "</html>",
+    ].join(""),
+  );
 });
 
 app.use("/", routes);
