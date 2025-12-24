@@ -94,21 +94,6 @@
             "type": "object",
             "nullable": true
           }
-        },
-        "required": [
-          "timestamp",
-          "path",
-          "status",
-          "code",
-          "message"
-        ],
-        "example": {
-          "timestamp": "2024-12-24T00:00:00.000Z",
-          "path": "/auth/login",
-          "status": 401,
-          "code": "INVALID_CREDENTIALS",
-          "message": "Invalid credentials",
-          "details": null
         }
       },
       "User": {

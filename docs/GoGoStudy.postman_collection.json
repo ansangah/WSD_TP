@@ -1186,6 +1186,67 @@
 			]
 		}
 	],
+	"event": [
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					"const status = pm.response.code;",
+					"const codes = [",
+					"  \"ACCOUNT_INACTIVE\",",
+					"  \"ALREADY_JOINED\",",
+					"  \"EMAIL_TAKEN\",",
+					"  \"FORBIDDEN\",",
+					"  \"GOOGLE_AUTH_NOT_CONFIGURED\",",
+					"  \"INVALID_CREDENTIALS\",",
+					"  \"INVALID_DATE\",",
+					"  \"INVALID_GOOGLE_TOKEN\",",
+					"  \"INVALID_ID\",",
+					"  \"INVALID_MEMBER_STATUS\",",
+					"  \"INVALID_OPERATION\",",
+					"  \"INVALID_PASSWORD\",",
+					"  \"INVALID_PAYLOAD\",",
+					"  \"INVALID_ROLE\",",
+					"  \"INVALID_STATUS\",",
+					"  \"INVALID_STUDY\",",
+					"  \"INVALID_TOKEN\",",
+					"  \"INVALID_USER_ID\",",
+					"  \"MEMBER_NOT_FOUND\",",
+					"  \"MEMBERSHIP_NOT_FOUND\",",
+					"  \"NOT_A_MEMBER\",",
+					"  \"PASSWORD_TOO_SHORT\",",
+					"  \"REFRESH_NOT_FOUND\",",
+					"  \"SESSION_NOT_FOUND\",",
+					"  \"STUDY_FULL\",",
+					"  \"STUDY_NOT_FOUND\",",
+					"  \"TOKEN_REVOKED\",",
+					"  \"UNAUTHORIZED\",",
+					"  \"UNKNOWN_ERROR\",",
+					"  \"USER_NOT_FOUND\",",
+					"  \"INTERNAL_ERROR\"",
+					"];",
+					"",
+					"if (status >= 400) {",
+					"  let data;",
+					"  try {",
+					"    data = pm.response.json();",
+					"  } catch (e) {",
+					"    pm.expect.fail(\"에러 응답이 JSON이 아님\");",
+					"  }",
+					"",
+					"  pm.test(\"에러 코드 필드 존재\", function () {",
+					"    pm.expect(data).to.have.property(\"code\");",
+					"  });",
+					"",
+					"  pm.test(\"에러 코드 값이 사전 정의 목록과 일치\", function () {",
+					"    pm.expect(codes).to.include(data.code);",
+					"  });",
+					"}"
+				]
+			}
+		}
+	],
 	"variable": [
 		{
 			"key": "baseUrl",
