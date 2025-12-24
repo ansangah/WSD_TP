@@ -377,6 +377,12 @@
       },
       "NoContent": {
         "description": "No content"
+      },
+      "Unauthorized": {
+        "description": "Unauthorized"
+      },
+      "Forbidden": {
+        "description": "Forbidden"
       }
     }
   },
@@ -717,7 +723,7 @@
         ],
         "responses": {
           "200": {
-            "description": "?? ?? ??",
+            "description": "OK",
             "content": {
               "application/json": {
                 "schema": {
@@ -763,7 +769,7 @@
             "schema": {
               "type": "string"
             },
-            "description": "?? ???"
+            "description": "Search keyword"
           },
           {
             "name": "keyword",
@@ -771,7 +777,7 @@
             "schema": {
               "type": "string"
             },
-            "description": "?? ???(q? ??)"
+            "description": "Search keyword (same as q)"
           },
           {
             "name": "page",
@@ -780,7 +786,7 @@
               "type": "integer",
               "minimum": 0
             },
-            "description": "??? (0?? ??)"
+            "description": "Page (0-based)"
           },
           {
             "name": "size",
@@ -790,7 +796,7 @@
               "minimum": 1,
               "maximum": 50
             },
-            "description": "??? ?? (?? 20, ?? 50)"
+            "description": "Page size (default 20, max 50)"
           },
           {
             "name": "sort",
@@ -798,7 +804,7 @@
             "schema": {
               "type": "string"
             },
-            "description": "??: field,ASC|DESC ?) createdAt,DESC"
+            "description": "Sort: field,ASC|DESC e.g. createdAt,DESC"
           }
         ]
       }
@@ -922,7 +928,7 @@
             "schema": {
               "type": "string"
             },
-            "description": "?? ???"
+            "description": "Search keyword"
           },
           {
             "name": "keyword",
@@ -930,7 +936,7 @@
             "schema": {
               "type": "string"
             },
-            "description": "?? ???(q? ??)"
+            "description": "Search keyword (same as q)"
           },
           {
             "name": "page",
@@ -939,7 +945,7 @@
               "type": "integer",
               "minimum": 0
             },
-            "description": "??? (0?? ??)"
+            "description": "Page (0-based)"
           },
           {
             "name": "size",
@@ -949,7 +955,7 @@
               "minimum": 1,
               "maximum": 50
             },
-            "description": "??? ?? (?? 20, ?? 50)"
+            "description": "Page size (default 20, max 50)"
           },
           {
             "name": "sort",
@@ -957,12 +963,12 @@
             "schema": {
               "type": "string"
             },
-            "description": "??: field,ASC|DESC ?) createdAt,DESC"
+            "description": "Sort: field,ASC|DESC e.g. createdAt,DESC"
           }
         ],
         "responses": {
           "200": {
-            "description": "?? ?? ??",
+            "description": "OK",
             "content": {
               "application/json": {
                 "schema": {
@@ -998,7 +1004,7 @@
             "$ref": "#/components/responses/BadRequest"
           },
           "401": {
-            "$ref": "#/components/responses/인증 실패"
+            "$ref": "#/components/responses/Unauthorized"
           },
           "500": {
             "$ref": "#/components/responses/InternalError"
@@ -1069,7 +1075,7 @@
             "$ref": "#/components/responses/BadRequest"
           },
           "401": {
-            "$ref": "#/components/responses/인증 실패"
+            "$ref": "#/components/responses/Unauthorized"
           },
           "500": {
             "$ref": "#/components/responses/InternalError"
@@ -1124,7 +1130,7 @@
             "$ref": "#/components/responses/BadRequest"
           },
           "401": {
-            "$ref": "#/components/responses/인증 실패"
+            "$ref": "#/components/responses/Unauthorized"
           },
           "404": {
             "$ref": "#/components/responses/NotFound"
@@ -1188,10 +1194,10 @@
             "$ref": "#/components/responses/BadRequest"
           },
           "401": {
-            "$ref": "#/components/responses/인증 실패"
+            "$ref": "#/components/responses/Unauthorized"
           },
           "403": {
-            "$ref": "#/components/responses/접근 거부"
+            "$ref": "#/components/responses/Forbidden"
           },
           "500": {
             "$ref": "#/components/responses/InternalError"
@@ -1267,10 +1273,10 @@
             "$ref": "#/components/responses/BadRequest"
           },
           "401": {
-            "$ref": "#/components/responses/인증 실패"
+            "$ref": "#/components/responses/Unauthorized"
           },
           "403": {
-            "$ref": "#/components/responses/접근 거부"
+            "$ref": "#/components/responses/Forbidden"
           },
           "500": {
             "$ref": "#/components/responses/InternalError"
@@ -1352,10 +1358,10 @@
             "$ref": "#/components/responses/BadRequest"
           },
           "401": {
-            "$ref": "#/components/responses/인증 실패"
+            "$ref": "#/components/responses/Unauthorized"
           },
           "403": {
-            "$ref": "#/components/responses/접근 거부"
+            "$ref": "#/components/responses/Forbidden"
           },
           "404": {
             "$ref": "#/components/responses/NotFound"
@@ -1451,10 +1457,10 @@
             "$ref": "#/components/responses/BadRequest"
           },
           "401": {
-            "$ref": "#/components/responses/인증 실패"
+            "$ref": "#/components/responses/Unauthorized"
           },
           "403": {
-            "$ref": "#/components/responses/접근 거부"
+            "$ref": "#/components/responses/Forbidden"
           },
           "404": {
             "$ref": "#/components/responses/NotFound"
@@ -1541,10 +1547,10 @@
             "$ref": "#/components/responses/BadRequest"
           },
           "401": {
-            "$ref": "#/components/responses/?몄쬆 ?ㅽ뙣"
+            "$ref": "#/components/responses/Unauthorized"
           },
           "403": {
-            "$ref": "#/components/responses/?묎렐 嫄곕?"
+            "$ref": "#/components/responses/Forbidden"
           },
           "404": {
             "$ref": "#/components/responses/NotFound"
@@ -1626,10 +1632,10 @@
             "$ref": "#/components/responses/BadRequest"
           },
           "401": {
-            "$ref": "#/components/responses/인증 실패"
+            "$ref": "#/components/responses/Unauthorized"
           },
           "403": {
-            "$ref": "#/components/responses/접근 거부"
+            "$ref": "#/components/responses/Forbidden"
           },
           "500": {
             "$ref": "#/components/responses/InternalError"
@@ -1735,7 +1741,7 @@
             "$ref": "#/components/responses/BadRequest"
           },
           "401": {
-            "$ref": "#/components/responses/인증 실패"
+            "$ref": "#/components/responses/Unauthorized"
           },
           "404": {
             "$ref": "#/components/responses/NotFound"
@@ -1841,7 +1847,7 @@
         "tags": [
           "Studies"
         ],
-        "summary": "??? ??",
+        "summary": "Delete study",
         "security": [
           {
             "bearerAuth": []
@@ -1862,10 +1868,10 @@
             "$ref": "#/components/responses/NoContent"
           },
           "401": {
-            "$ref": "#/components/responses/?? ??"
+            "$ref": "#/components/responses/Unauthorized"
           },
           "403": {
-            "$ref": "#/components/responses/?? ??"
+            "$ref": "#/components/responses/Forbidden"
           },
           "404": {
             "$ref": "#/components/responses/NotFound"
@@ -1928,10 +1934,10 @@
             "$ref": "#/components/responses/BadRequest"
           },
           "401": {
-            "$ref": "#/components/responses/인증 실패"
+            "$ref": "#/components/responses/Unauthorized"
           },
           "403": {
-            "$ref": "#/components/responses/접근 거부"
+            "$ref": "#/components/responses/Forbidden"
           },
           "404": {
             "$ref": "#/components/responses/NotFound"
@@ -2165,10 +2171,10 @@
             "$ref": "#/components/responses/BadRequest"
           },
           "401": {
-            "$ref": "#/components/responses/인증 실패"
+            "$ref": "#/components/responses/Unauthorized"
           },
           "403": {
-            "$ref": "#/components/responses/접근 거부"
+            "$ref": "#/components/responses/Forbidden"
           },
           "404": {
             "$ref": "#/components/responses/NotFound"
@@ -2211,7 +2217,7 @@
             "schema": {
               "type": "string"
             },
-            "description": "?? ??"
+            "description": ""
           },
           {
             "name": "q",
@@ -2219,7 +2225,7 @@
             "schema": {
               "type": "string"
             },
-            "description": "?? ???"
+            "description": "Search keyword"
           },
           {
             "name": "keyword",
@@ -2227,7 +2233,7 @@
             "schema": {
               "type": "string"
             },
-            "description": "?? ???(q? ??)"
+            "description": "Search keyword (same as q)"
           },
           {
             "name": "page",
@@ -2236,7 +2242,7 @@
               "type": "integer",
               "minimum": 0
             },
-            "description": "??? (0?? ??)"
+            "description": "Page (0-based)"
           },
           {
             "name": "size",
@@ -2246,7 +2252,7 @@
               "minimum": 1,
               "maximum": 50
             },
-            "description": "??? ?? (?? 20, ?? 50)"
+            "description": "Page size (default 20, max 50)"
           },
           {
             "name": "sort",
@@ -2254,12 +2260,12 @@
             "schema": {
               "type": "string"
             },
-            "description": "??: field,ASC|DESC ?) createdAt,DESC"
+            "description": "Sort: field,ASC|DESC e.g. createdAt,DESC"
           }
         ],
         "responses": {
           "200": {
-            "description": "?? ?? ??",
+            "description": "OK",
             "content": {
               "application/json": {
                 "schema": {
@@ -2324,10 +2330,10 @@
             "$ref": "#/components/responses/BadRequest"
           },
           "401": {
-            "$ref": "#/components/responses/인증 실패"
+            "$ref": "#/components/responses/Unauthorized"
           },
           "403": {
-            "$ref": "#/components/responses/접근 거부"
+            "$ref": "#/components/responses/Forbidden"
           },
           "500": {
             "$ref": "#/components/responses/InternalError"
@@ -2413,10 +2419,10 @@
             "$ref": "#/components/responses/BadRequest"
           },
           "401": {
-            "$ref": "#/components/responses/인증 실패"
+            "$ref": "#/components/responses/Unauthorized"
           },
           "403": {
-            "$ref": "#/components/responses/접근 거부"
+            "$ref": "#/components/responses/Forbidden"
           },
           "404": {
             "$ref": "#/components/responses/NotFound"
@@ -2488,10 +2494,10 @@
             "$ref": "#/components/responses/BadRequest"
           },
           "401": {
-            "$ref": "#/components/responses/인증 실패"
+            "$ref": "#/components/responses/Unauthorized"
           },
           "403": {
-            "$ref": "#/components/responses/접근 거부"
+            "$ref": "#/components/responses/Forbidden"
           },
           "404": {
             "$ref": "#/components/responses/NotFound"
@@ -2552,7 +2558,7 @@
             "$ref": "#/components/responses/BadRequest"
           },
           "401": {
-            "$ref": "#/components/responses/인증 실패"
+            "$ref": "#/components/responses/Unauthorized"
           },
           "404": {
             "$ref": "#/components/responses/NotFound"
@@ -2608,7 +2614,7 @@
             "$ref": "#/components/responses/BadRequest"
           },
           "401": {
-            "$ref": "#/components/responses/인증 실패"
+            "$ref": "#/components/responses/Unauthorized"
           },
           "500": {
             "$ref": "#/components/responses/InternalError"
@@ -2661,7 +2667,7 @@
             "$ref": "#/components/responses/BadRequest"
           },
           "401": {
-            "$ref": "#/components/responses/권한 없음"
+            "$ref": "#/components/responses/Unauthorized"
           },
           "500": {
             "$ref": "#/components/responses/InternalError"
@@ -2722,10 +2728,10 @@
             "$ref": "#/components/responses/BadRequest"
           },
           "401": {
-            "$ref": "#/components/responses/인증 실패"
+            "$ref": "#/components/responses/Unauthorized"
           },
           "403": {
-            "$ref": "#/components/responses/접근 거부"
+            "$ref": "#/components/responses/Forbidden"
           },
           "404": {
             "$ref": "#/components/responses/NotFound"
@@ -2767,7 +2773,7 @@
             "schema": {
               "type": "string"
             },
-            "description": "?? ???"
+            "description": "Search keyword"
           },
           {
             "name": "keyword",
@@ -2775,7 +2781,7 @@
             "schema": {
               "type": "string"
             },
-            "description": "?? ???(q? ??)"
+            "description": "Search keyword (same as q)"
           },
           {
             "name": "page",
@@ -2784,7 +2790,7 @@
               "type": "integer",
               "minimum": 0
             },
-            "description": "??? (0?? ??)"
+            "description": "Page (0-based)"
           },
           {
             "name": "size",
@@ -2794,7 +2800,7 @@
               "minimum": 1,
               "maximum": 50
             },
-            "description": "??? ?? (?? 20, ?? 50)"
+            "description": "Page size (default 20, max 50)"
           },
           {
             "name": "sort",
@@ -2802,12 +2808,12 @@
             "schema": {
               "type": "string"
             },
-            "description": "??: field,ASC|DESC ?) createdAt,DESC"
+            "description": "Sort: field,ASC|DESC e.g. createdAt,DESC"
           }
         ],
         "responses": {
           "200": {
-            "description": "?? ?? ??",
+            "description": "OK",
             "content": {
               "application/json": {
                 "schema": {
@@ -2843,10 +2849,10 @@
             "$ref": "#/components/responses/BadRequest"
           },
           "401": {
-            "$ref": "#/components/responses/인증 실패"
+            "$ref": "#/components/responses/Unauthorized"
           },
           "403": {
-            "$ref": "#/components/responses/접근 거부"
+            "$ref": "#/components/responses/Forbidden"
           },
           "500": {
             "$ref": "#/components/responses/InternalError"
@@ -2927,10 +2933,10 @@
             }
           },
           "401": {
-            "$ref": "#/components/responses/인증 실패"
+            "$ref": "#/components/responses/Unauthorized"
           },
           "403": {
-            "$ref": "#/components/responses/접근 거부"
+            "$ref": "#/components/responses/Forbidden"
           },
           "500": {
             "$ref": "#/components/responses/InternalError"
