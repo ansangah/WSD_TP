@@ -1,5 +1,7 @@
 import crypto from "crypto";
 import { prisma } from "../../config/db";
+import { getFirebaseAuth } from "../../config/firebase";
+import { createError } from "../../utils/errors";
 
 type FirebaseUserPayload = {
   uid: string;
@@ -8,10 +10,7 @@ type FirebaseUserPayload = {
 };
 
 /**
- * Firebase ID 토큰 정보로 로컬 사용자와 매핑하거나 없으면 생성한다.
- * - 매핑 키는 이메일(고유) 기반.
- * - 소셜 로그인 계정에는 로그인용 비밀번호가 없으므로 더미 해시를 저장한다.
- * - 기본 role/status는 스키마 기본값(USER/ACTIVE)을 그대로 사용.
+ * Firebase ID 토큰 기반 사용자 upsert + 로그인용 헬퍼.
  */
 export const findOrCreateUserByFirebase = async ({
   uid,
@@ -19,15 +18,13 @@ export const findOrCreateUserByFirebase = async ({
   name,
 }: FirebaseUserPayload) => {
   if (!email) {
-    const error = new Error("Firebase user does not contain email") as Error & {
-      statusCode?: number;
-    };
-    error.statusCode = 400;
-    throw error;
+    throw createError("Firebase user does not contain email", {
+      statusCode: 400,
+      code: "INVALID_GOOGLE_TOKEN",
+    });
   }
 
   const displayName = name?.trim() || email.split("@")[0];
-  // Firebase UID 기반 더미 해시(로컬 패스워드 로그인에는 사용되지 않음)
   const passwordHash = crypto
     .createHash("sha256")
     .update(`firebase:${uid}`)
@@ -40,7 +37,32 @@ export const findOrCreateUserByFirebase = async ({
       email,
       name: displayName,
       passwordHash,
-      // role/status는 Prisma 스키마 기본값 사용(USER/ACTIVE)
+      provider: "FIREBASE",
+      providerId: uid,
     },
   });
+};
+
+export const loginWithFirebaseIdToken = async (idToken: string) => {
+  if (!idToken) {
+    throw createError("idToken is required", {
+      statusCode: 400,
+      code: "INVALID_PAYLOAD",
+    });
+  }
+
+  try {
+    const auth = getFirebaseAuth();
+    const decoded = await auth.verifyIdToken(idToken);
+    return findOrCreateUserByFirebase({
+      uid: decoded.uid,
+      email: decoded.email,
+      name: decoded.name,
+    });
+  } catch (error) {
+    throw createError("Invalid Firebase token", {
+      statusCode: 401,
+      code: "INVALID_GOOGLE_TOKEN",
+    });
+  }
 };

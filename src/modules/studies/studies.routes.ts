@@ -3,6 +3,7 @@ import { prisma } from "../../config/db";
 import { authenticate } from "../../middlewares/auth";
 import { requireStudyLeader } from "../../middlewares/rbac";
 import { createError } from "../../utils/errors";
+import { parsePagination, parseSortParam } from "../../utils/pagination";
 
 const router = Router();
 
@@ -51,13 +52,6 @@ export const getStudyOrThrow = async (studyId: number) => {
   return study;
 };
 
-export const parsePagination = (pageParam?: string, sizeParam?: string) => {
-  const page = Math.max(1, Number(pageParam) || 1);
-  const pageSize = Math.min(50, Math.max(1, Number(sizeParam) || 10));
-  const skip = (page - 1) * pageSize;
-  return { page, pageSize, skip, take: pageSize };
-};
-
 export const validateMemberStatus = (status: string) => {
   const allowed = ["APPROVED", "PENDING", "REJECTED"];
   if (!allowed.includes(status)) {
@@ -67,23 +61,6 @@ export const validateMemberStatus = (status: string) => {
     });
   }
   return status;
-};
-
-const parseSort = (rawSort?: string) => {
-  const defaultSort = { createdAt: "desc" as const };
-  if (!rawSort) {
-    return defaultSort;
-  }
-
-  const [field, direction] = rawSort.split(":");
-  const allowedFields = ["createdAt", "title", "status"];
-  const allowedDirections = ["asc", "desc"];
-
-  if (!allowedFields.includes(field) || !allowedDirections.includes(direction)) {
-    return defaultSort;
-  }
-
-  return { [field]: direction } as Record<string, "asc" | "desc">;
 };
 
 router.post("/", authenticate, async (req, res, next) => {
@@ -138,18 +115,28 @@ router.post("/", authenticate, async (req, res, next) => {
 
 router.get("/", authenticate, async (req, res, next) => {
   try {
-    const { q, category, status, page, pageSize, sort } = req.query;
-    const pagination = parsePagination(
-      String(page ?? ""),
-      String(pageSize ?? ""),
+    const { q, keyword, category, status, page, pageSize, size, sort } = req.query;
+    const pagination = parsePagination({
+      page: typeof page === "string" ? page : undefined,
+      size: typeof pageSize === "string"
+        ? pageSize
+        : typeof size === "string"
+          ? size
+          : undefined,
+    });
+    const { orderBy, sortString } = parseSortParam(
+      typeof sort === "string" ? sort : undefined,
+      ["createdAt", "title", "status"],
+      "createdAt",
     );
-    const orderBy = parseSort(String(sort ?? ""));
 
     const where: any = {};
-    if (q) {
+    const keywordQuery = (q ?? keyword) as string | undefined;
+    if (keywordQuery) {
+      const value = String(keywordQuery);
       where.OR = [
-        { title: { contains: String(q), mode: "insensitive" } },
-        { description: { contains: String(q), mode: "insensitive" } },
+        { title: { contains: value, mode: "insensitive" } },
+        { description: { contains: value, mode: "insensitive" } },
       ];
     }
     if (category) {
@@ -160,24 +147,26 @@ router.get("/", authenticate, async (req, res, next) => {
     }
 
     const [items, total] = await Promise.all([
-      prisma.study.findMany({
-        where,
-        orderBy,
-        skip: pagination.skip,
-        take: pagination.take,
-        include: {
-          _count: { select: { StudyMembers: true, Sessions: true } },
-          leader: { select: { id: true, name: true, email: true } },
-        },
-      }),
-      prisma.study.count({ where }),
-    ]);
+        prisma.study.findMany({
+          where,
+          orderBy,
+          skip: pagination.skip,
+          take: pagination.take,
+          include: {
+            _count: { select: { StudyMembers: true, Sessions: true } },
+            leader: { select: { id: true, name: true, email: true } },
+          },
+        }),
+        prisma.study.count({ where }),
+      ]);
 
     res.json({
-      data: items,
+      content: items,
       page: pagination.page,
-      pageSize: pagination.pageSize,
-      total,
+      size: pagination.size,
+      totalElements: total,
+      totalPages: Math.ceil(total / pagination.size),
+      sort: sortString,
     });
   } catch (error) {
     next(error);
@@ -341,7 +330,7 @@ router.delete("/:studyId", authenticate, requireStudyLeader("studyId"), async (r
       await tx.study.delete({ where: { id: studyId } });
     });
 
-    res.json({ success: true });
+    res.status(204).send();
   } catch (error) {
     next(error);
   }
@@ -507,7 +496,7 @@ router.delete(
       }
 
       await prisma.attendanceSession.delete({ where: { id: sessionId } });
-      res.json({ success: true });
+      res.status(204).send();
     } catch (error) {
       next(error);
     }
@@ -778,18 +767,38 @@ router.get(
     try {
       const studyId = parseId(req.params.studyId, "study");
       const { status } = req.query;
-      const { page, pageSize, skip, take } = parsePagination(
-        String(req.query.page ?? ""),
-        String(req.query.pageSize ?? ""),
-      );
+      const { page, size, skip, take } = parsePagination({
+        page: typeof req.query.page === "string" ? req.query.page : undefined,
+        size:
+          typeof req.query.pageSize === "string"
+            ? req.query.pageSize
+            : typeof req.query.size === "string"
+              ? req.query.size
+              : undefined,
+      });
       const where: any = { studyId };
+      const keyword = (req.query.q ?? req.query.keyword) as string | undefined;
+      if (keyword) {
+        const value = String(keyword);
+        where.OR = [
+          { user: { email: { contains: value, mode: "insensitive" } } },
+          { user: { name: { contains: value, mode: "insensitive" } } },
+        ];
+      }
       if (status) {
         where.status = String(status);
       }
 
+      const { orderBy, sortString } = parseSortParam(
+        typeof req.query.sort === "string" ? req.query.sort : undefined,
+        ["joinedAt", "email", "name", "status"],
+        "joinedAt",
+        "asc",
+      );
+
       const members = await prisma.studyMember.findMany({
         where,
-        orderBy: { joinedAt: "asc" },
+        orderBy,
         skip,
         take,
         include: {
@@ -801,7 +810,14 @@ router.get(
 
       const total = await prisma.studyMember.count({ where });
 
-      res.json({ members, page, pageSize, total });
+      res.json({
+        content: members,
+        page,
+        size,
+        totalElements: total,
+        totalPages: Math.ceil(total / size),
+        sort: sortString,
+      });
     } catch (error) {
       next(error);
     }
@@ -905,7 +921,7 @@ router.delete(
         where: { studyId_userId: { studyId, userId } },
       });
 
-      res.json({ success: true });
+      res.status(204).send();
     } catch (error) {
       next(error);
     }
@@ -940,7 +956,7 @@ router.post(
         where: { studyId_userId: { studyId, userId: req.user!.id } },
       });
 
-      res.json({ success: true });
+      res.status(204).send();
     } catch (error) {
       next(error);
     }

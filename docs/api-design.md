@@ -4,6 +4,13 @@
 - Base URL: `http://localhost:8080`
 - Auth: `Authorization: Bearer <accessToken>`
 - Common error response: `{ timestamp, path, status, code, message, details }`
+- Error codes: `ACCOUNT_INACTIVE`, `ALREADY_JOINED`, `EMAIL_TAKEN`, `FORBIDDEN`, `GOOGLE_AUTH_NOT_CONFIGURED`, `INVALID_CREDENTIALS`, `INVALID_DATE`, `INVALID_GOOGLE_TOKEN`, `INVALID_ID`, `INVALID_MEMBER_STATUS`, `INVALID_OPERATION`, `INVALID_PASSWORD`, `INVALID_PAYLOAD`, `INVALID_ROLE`, `INVALID_STATUS`, `INVALID_STUDY`, `INVALID_TOKEN`, `INVALID_USER_ID`, `MEMBER_NOT_FOUND`, `MEMBERSHIP_NOT_FOUND`, `NOT_A_MEMBER`, `PASSWORD_TOO_SHORT`, `REFRESH_NOT_FOUND`, `SESSION_NOT_FOUND`, `STUDY_FULL`, `STUDY_NOT_FOUND`, `TOKEN_REVOKED`, `UNAUTHORIZED`, `UNKNOWN_ERROR`, `USER_NOT_FOUND`, `INTERNAL_ERROR`
+
+## Response format
+- 성공(조회): 리소스 중심으로 응답 (`{ user }`, `{ study }`, `{ data: Study[], page, pageSize, total }` 등)
+- 성공(상태 변경): 명시적 성공 표시 (`{ success: true }`) 또는 변경된 리소스 반환
+- 실패: `{ timestamp, path, status, code, message, details }`
+  - 예시: `{ "timestamp": "2024-12-24T00:00:00.000Z", "path": "/auth/login", "status": 401, "code": "INVALID_CREDENTIALS", "message": "Invalid credentials", "details": null }`
 
 ## Auth
 - `POST /auth/register`
