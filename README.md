@@ -24,6 +24,8 @@
    ```bash
    npx prisma migrate dev
    npm run seed
+   npx prisma migrate dev
+   npm run seed
    ```
 4. 서버 실행
    ```bash
