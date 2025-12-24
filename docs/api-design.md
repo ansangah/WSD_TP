@@ -12,6 +12,9 @@
 - `POST /auth/login`
   - Body: `{ email, password }`
   - Response: `{ user, accessToken, refreshToken }`
+- `POST /auth/google`
+  - Body: `{ idToken }`
+  - Response: `{ user, accessToken, refreshToken }`
 - `POST /auth/refresh`
   - Body: `{ refreshToken }`
   - Response: `{ user, accessToken, refreshToken }`
@@ -24,6 +27,9 @@
 - `GET /users/me`
   - Header: `Authorization: Bearer <accessToken>`
   - Response: `{ user }`
+- `GET /users/me/attendance`
+  - Header: `Authorization: Bearer <accessToken>`
+  - Response: `{ userId, totalSessions, summary }`
 - `PATCH /users/me`
   - Header: `Authorization: Bearer <accessToken>`
   - Body: `{ name }`
@@ -37,6 +43,9 @@
 - `GET /admin/users`
   - Header: `Authorization: Bearer <accessToken>` (ADMIN)
   - Response: `{ users }`
+- `GET /admin/users/:id/attendance`
+  - Header: `Authorization: Bearer <accessToken>` (ADMIN)
+  - Response: `{ userId, totalSessions, summary }`
 - `PATCH /admin/users/:id/role`
   - Header: `Authorization: Bearer <accessToken>` (ADMIN)
   - Body: `{ role: USER | ADMIN }`
@@ -44,6 +53,15 @@
 - `PATCH /admin/users/:id/deactivate`
   - Header: `Authorization: Bearer <accessToken>` (ADMIN)
   - Response: `{ user }`
+
+## Admin Studies & Stats
+- `GET /admin/studies`
+  - Header: `Authorization: Bearer <accessToken>` (ADMIN)
+  - Query: `q?, category?, status?, page?, pageSize?`
+  - Response: `{ data: Study[], page, pageSize, total }`
+- `GET /admin/stats/overview`
+  - Header: `Authorization: Bearer <accessToken>` (ADMIN)
+  - Response: `{ totals }`
 
 ## Studies & Attendance
 - `POST /studies`
@@ -54,9 +72,23 @@
   - Header: `Authorization: Bearer <accessToken>`
   - Query: `q?, category?, status?, page?, pageSize?`
   - Response: `{ data: Study[], page, pageSize, total }`
+- `GET /studies/me`
+  - Header: `Authorization: Bearer <accessToken>`
+  - Response: `{ studies }`
 - `GET /studies/:studyId`
   - Header: `Authorization: Bearer <accessToken>`
   - Response: `{ study }`
+- `PATCH /studies/:studyId`
+  - Header: `Authorization: Bearer <accessToken>` (Study Leader)
+  - Body: `{ title?, description?, category?, maxMembers? }`
+  - Response: `{ study }`
+- `PATCH /studies/:studyId/status`
+  - Header: `Authorization: Bearer <accessToken>` (Study Leader)
+  - Body: `{ status: RECRUITING | CLOSED }`
+  - Response: `{ study }`
+- `DELETE /studies/:studyId`
+  - Header: `Authorization: Bearer <accessToken>` (Study Leader)
+  - Response: `{ success: true }`
 - `POST /studies/:studyId/join`
   - Header: `Authorization: Bearer <accessToken>`
   - Response: `{ membership }` (status=`PENDING`; leader 승인 필요)
@@ -78,6 +110,13 @@
   - Header: `Authorization: Bearer <accessToken>` (Study Leader)
   - Body: `{ title, date }`
   - Response: `{ session }`
+- `PATCH /studies/:studyId/sessions/:sessionId`
+  - Header: `Authorization: Bearer <accessToken>` (Study Leader)
+  - Body: `{ title?, date? }`
+  - Response: `{ session }`
+- `DELETE /studies/:studyId/sessions/:sessionId`
+  - Header: `Authorization: Bearer <accessToken>` (Study Leader)
+  - Response: `{ success: true }`
 - `GET /studies/:studyId/sessions`
   - Header: `Authorization: Bearer <accessToken>` (Approved Member)
   - Response: `{ sessions }`
@@ -89,6 +128,9 @@
   - Body: `{ status: PRESENT | LATE | ABSENT }`
   - Response: `{ record }`
 - `GET /studies/:studyId/sessions/:sessionId/attendance`
+  - Header: `Authorization: Bearer <accessToken>` (Study Leader)
+  - Response: `{ sessionId, records }`
+- `GET /sessions/:sessionId/attendance`
   - Header: `Authorization: Bearer <accessToken>` (Study Leader)
   - Response: `{ sessionId, records }`
 - `GET /studies/:studyId/attendance/summary`
