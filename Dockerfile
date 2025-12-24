@@ -19,6 +19,9 @@ COPY --from=builder /app/dist ./dist
 COPY prisma ./prisma
 # docs 정적 파일 포함
 COPY docs ./docs
+# seed 스크립트와 설정 포함 (컨테이너 내 seed 실행용)
+COPY seed ./seed
+COPY tsconfig.seed.json ./tsconfig.seed.json
 # Prisma Client 결과물 복사
 COPY --from=builder /app/node_modules/@prisma ./node_modules/@prisma
 COPY --from=builder /app/node_modules/.prisma ./node_modules/.prisma
